@@ -99,9 +99,9 @@ public class ApiController {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during cashout request: " + e.getMessage());
-        } catch (IllegalArgumentException e) { // Catch potential issues from HttpStatus.valueOf
-            System.err.println("Error creating HTTP status for /cashout: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal configuration error for cashout endpoint.");
+        } catch (RuntimeException e) { // Catch potential issues from HttpStatus.valueOf or other runtime issues
+            System.err.println("Error processing /cashout: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error processing cashout request.");
         }
     }
 
@@ -146,9 +146,7 @@ public class ApiController {
             System.err.println("Simulated runtime error in /loan-request: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // Default to 500 if exception is caught
                                  .body("Failed to process loan request due to an internal error (simulated). Detail: " + e.getMessage());
-        } catch (IllegalArgumentException e) { // Catch potential issues from HttpStatus.valueOf
-            System.err.println("Error creating HTTP status for /loan-request: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal configuration error for loan-request endpoint.");
+        // Removed redundant catch for IllegalArgumentException as RuntimeException already covers it.
         }
     }
 }
