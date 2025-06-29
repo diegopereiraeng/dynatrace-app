@@ -57,11 +57,17 @@ A aplicação agora suporta a configuração de latência e taxas de erro para s
 | `CASHOUT_FAILURE_PERCENTAGE`        | `cashout.failure.percentage`        | 20      | Porcentagem (0-100) de chance de falha para solicitações de saque.       | `/api/cashout`       |
 | `CASHOUT_LATENCY_MIN_MS`            | `cashout.latency.min.ms`            | 100     | Latência mínima em milissegundos para solicitações de saque.              | `/api/cashout`       |
 | `CASHOUT_LATENCY_MAX_MS`            | `cashout.latency.max.ms`            | 300     | Latência máxima em milissegundos para solicitações de saque.              | `/api/cashout`       |
+| `CASHOUT_ERROR_5XX_CODE`            | `cashout.error.5xx.code`            | 503     | Código de erro HTTP 5xx a ser retornado em caso de falha 5xx.             | `/api/cashout`       |
+| `CASHOUT_ERROR_4XX_CODE`            | `cashout.error.4xx.code`            | 400     | Código de erro HTTP 4xx a ser retornado em caso de falha 4xx.             | `/api/cashout`       |
+| `CASHOUT_PERCENTAGE_OF_FAILURES_AS_5XX` | `cashout.percentage.of.failures.as.5xx` | 70 | Do total de falhas, % que serão erros 5xx (o restante será 4xx).        | `/api/cashout`       |
 | `CREDIT_ANALYSIS_LATENCY_MIN_MS`    | `credit.analysis.latency.min.ms`    | 1500    | Latência mínima em milissegundos para análise de crédito.                 | `/api/credit-analysis` |
 | `CREDIT_ANALYSIS_LATENCY_MAX_MS`    | `credit.analysis.latency.max.ms`    | 3000    | Latência máxima em milissegundos para análise de crédito.                 | `/api/credit-analysis` |
 | `LOAN_REQUEST_FAILURE_PERCENTAGE`   | `loan.request.failure.percentage`   | 100     | Porcentagem (0-100) de chance de falha para solicitações de empréstimo.  | `/api/loan-request`  |
 | `LOAN_REQUEST_LATENCY_MIN_MS`       | `loan.request.latency.min.ms`       | 50      | Latência mínima em milissegundos para solicitações de empréstimo.         | `/api/loan-request`  |
 | `LOAN_REQUEST_LATENCY_MAX_MS`       | `loan.request.latency.max.ms`       | 150     | Latência máxima em milissegundos para solicitações de empréstimo.         | `/api/loan-request`  |
+| `LOAN_REQUEST_ERROR_5XX_CODE`       | `loan.request.error.5xx.code`       | 500     | Código de erro HTTP 5xx a ser retornado/simulado.                       | `/api/loan-request`  |
+| `LOAN_REQUEST_ERROR_4XX_CODE`       | `loan.request.error.4xx.code`       | 400     | Código de erro HTTP 4xx a ser retornado.                                | `/api/loan-request`  |
+| `LOAN_REQUEST_PERCENTAGE_OF_FAILURES_AS_5XX` | `loan.request.percentage.of.failures.as.5xx` | 100 | Do total de falhas, % que serão erros 5xx (o restante será 4xx).    | `/api/loan-request`  |
 
 **Exemplo de Execução com Variáveis de Ambiente:**
 

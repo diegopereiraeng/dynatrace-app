@@ -30,6 +30,13 @@ public class ApiController {
     private int cashoutLatencyMinMs;
     @Value("${cashout.latency.max.ms:300}")
     private int cashoutLatencyMaxMs;
+    @Value("${cashout.error.5xx.code:503}")
+    private int cashout5xxErrorCode;
+    @Value("${cashout.error.4xx.code:400}")
+    private int cashout4xxErrorCode;
+    @Value("${cashout.percentage.of.failures.as.5xx:70}")
+    private int cashoutPercentageOfFailuresAs5xx;
+
 
     // Configuration for /credit-analysis endpoint
     @Value("${credit.analysis.latency.min.ms:1500}")
@@ -44,6 +51,12 @@ public class ApiController {
     private int loanRequestLatencyMinMs;
     @Value("${loan.request.latency.max.ms:150}")
     private int loanRequestLatencyMaxMs;
+    @Value("${loan.request.error.5xx.code:500}")
+    private int loanRequest5xxErrorCode;
+    @Value("${loan.request.error.4xx.code:400}")
+    private int loanRequest4xxErrorCode;
+    @Value("${loan.request.percentage.of.failures.as.5xx:100}")
+    private int loanRequestPercentageOfFailuresAs5xx;
 
 
     private void simulateLatency(int minMs, int maxMs) throws InterruptedException {
@@ -71,12 +84,24 @@ public class ApiController {
             simulateLatency(cashoutLatencyMinMs, cashoutLatencyMaxMs);
 
             if (random.nextInt(100) < cashoutFailurePercentage) {
-                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body("Cashout service temporarily unavailable (simulated error).");
+                // Determine if it's a 5xx or 4xx error based on weight
+                if (random.nextInt(100) < cashoutPercentageOfFailuresAs5xx) {
+                    // Return configured 5xx error
+                    return ResponseEntity.status(HttpStatus.valueOf(cashout5xxErrorCode))
+                                         .body("Cashout service temporarily unavailable (simulated 5xx error: " + cashout5xxErrorCode + ").");
+                } else {
+                    // Return configured 4xx error
+                    return ResponseEntity.status(HttpStatus.valueOf(cashout4xxErrorCode))
+                                         .body("Invalid cashout request (simulated 4xx error: " + cashout4xxErrorCode + ").");
+                }
             }
             return ResponseEntity.ok("Cashout request successful.");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error during cashout request: " + e.getMessage());
+        } catch (IllegalArgumentException e) { // Catch potential issues from HttpStatus.valueOf
+            System.err.println("Error creating HTTP status for /cashout: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal configuration error for cashout endpoint.");
         }
     }
 
@@ -97,15 +122,33 @@ public class ApiController {
             simulateLatency(loanRequestLatencyMinMs, loanRequestLatencyMaxMs);
 
             if (random.nextInt(100) < loanRequestFailurePercentage) {
-                 throw new RuntimeException("Internal system error processing loan request (simulated error).");
+                // Determine if it's a 5xx or 4xx error based on weight
+                if (random.nextInt(100) < loanRequestPercentageOfFailuresAs5xx) {
+                    // Throw a RuntimeException which will be caught and result in a 500, or use specific 5xx code
+                    if (loanRequest5xxErrorCode == 500) { // Default behavior: throw exception for 500
+                        throw new RuntimeException("Internal system error processing loan request (simulated 5xx error: " + loanRequest5xxErrorCode + ").");
+                    } else {
+                        // Return specific configured 5xx error
+                        return ResponseEntity.status(HttpStatus.valueOf(loanRequest5xxErrorCode))
+                                             .body("Failed to process loan request due to a server-side issue (simulated 5xx error: " + loanRequest5xxErrorCode + ").");
+                    }
+                } else {
+                    // Return configured 4xx error
+                    return ResponseEntity.status(HttpStatus.valueOf(loanRequest4xxErrorCode))
+                                         .body("Invalid loan request (simulated 4xx error: " + loanRequest4xxErrorCode + ").");
+                }
             }
             return ResponseEntity.ok("Loan request submitted successfully.");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Interrupted error during loan request: " + e.getMessage());
-        } catch (RuntimeException e) {
-            System.err.println("Simulated error in /loan-request: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process loan request due to an internal error (simulated).");
+        } catch (RuntimeException e) { // This will catch the RuntimeException thrown for 500-type errors
+            System.err.println("Simulated runtime error in /loan-request: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR) // Default to 500 if exception is caught
+                                 .body("Failed to process loan request due to an internal error (simulated). Detail: " + e.getMessage());
+        } catch (IllegalArgumentException e) { // Catch potential issues from HttpStatus.valueOf
+            System.err.println("Error creating HTTP status for /loan-request: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal configuration error for loan-request endpoint.");
         }
     }
 }
