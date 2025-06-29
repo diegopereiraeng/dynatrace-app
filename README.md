@@ -44,6 +44,47 @@ A aplicação expõe os seguintes endpoints sob o caminho base `/api`:
     ```
     A aplicação será iniciada por padrão na porta `8080`.
 
+### Configurando Comportamento via Variáveis de Ambiente
+
+A aplicação agora suporta a configuração de latência e taxas de erro para seus endpoints através de variáveis de ambiente (ou propriedades do Spring Boot). Isso é útil para simular diferentes cenários de performance e confiabilidade.
+
+**Variáveis de Ambiente Disponíveis:**
+
+| Variável de Ambiente                | Propriedade Spring Boot             | Default | Descrição                                                                 | Endpoint Afetado     |
+| ----------------------------------- | ----------------------------------- | ------- | ------------------------------------------------------------------------- | -------------------- |
+| `PAYMENTS_LATENCY_MIN_MS`           | `payments.latency.min.ms`           | 50      | Latência mínima em milissegundos para o processamento de pagamentos.      | `/api/payments`      |
+| `PAYMENTS_LATENCY_MAX_MS`           | `payments.latency.max.ms`           | 200     | Latência máxima em milissegundos para o processamento de pagamentos.      | `/api/payments`      |
+| `CASHOUT_FAILURE_PERCENTAGE`        | `cashout.failure.percentage`        | 20      | Porcentagem (0-100) de chance de falha para solicitações de saque.       | `/api/cashout`       |
+| `CASHOUT_LATENCY_MIN_MS`            | `cashout.latency.min.ms`            | 100     | Latência mínima em milissegundos para solicitações de saque.              | `/api/cashout`       |
+| `CASHOUT_LATENCY_MAX_MS`            | `cashout.latency.max.ms`            | 300     | Latência máxima em milissegundos para solicitações de saque.              | `/api/cashout`       |
+| `CREDIT_ANALYSIS_LATENCY_MIN_MS`    | `credit.analysis.latency.min.ms`    | 1500    | Latência mínima em milissegundos para análise de crédito.                 | `/api/credit-analysis` |
+| `CREDIT_ANALYSIS_LATENCY_MAX_MS`    | `credit.analysis.latency.max.ms`    | 3000    | Latência máxima em milissegundos para análise de crédito.                 | `/api/credit-analysis` |
+| `LOAN_REQUEST_FAILURE_PERCENTAGE`   | `loan.request.failure.percentage`   | 100     | Porcentagem (0-100) de chance de falha para solicitações de empréstimo.  | `/api/loan-request`  |
+| `LOAN_REQUEST_LATENCY_MIN_MS`       | `loan.request.latency.min.ms`       | 50      | Latência mínima em milissegundos para solicitações de empréstimo.         | `/api/loan-request`  |
+| `LOAN_REQUEST_LATENCY_MAX_MS`       | `loan.request.latency.max.ms`       | 150     | Latência máxima em milissegundos para solicitações de empréstimo.         | `/api/loan-request`  |
+
+**Exemplo de Execução com Variáveis de Ambiente:**
+
+Para simular um cenário onde a análise de crédito é muito lenta e os saques falham com mais frequência:
+
+```bash
+export CREDIT_ANALYSIS_LATENCY_MIN_MS=5000
+export CREDIT_ANALYSIS_LATENCY_MAX_MS=10000
+export CASHOUT_FAILURE_PERCENTAGE=75
+java -jar target/dynatrace-app-0.0.1-SNAPSHOT.jar
+```
+
+Ou passando como propriedades do sistema Java:
+
+```bash
+java -Dcredit.analysis.latency.min.ms=5000 \
+     -Dcredit.analysis.latency.max.ms=10000 \
+     -Dcashout.failure.percentage=75 \
+     -jar target/dynatrace-app-0.0.1-SNAPSHOT.jar
+```
+
+Isto permite criar diferentes "perfis" de execução da aplicação para testar como o Dynatrace detecta e reporta essas mudanças de comportamento.
+
 ## Monitorando com Dynatrace
 
 Para monitorar esta aplicação com o Dynatrace, siga os passos abaixo:
