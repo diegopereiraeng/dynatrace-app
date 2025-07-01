@@ -24,7 +24,7 @@ public class ApiController {
     private int paymentsLatencyMaxMs;
 
     // Configuration for /cashout endpoint
-    @Value("${cashout.failure.percentage:20}")
+    @Value("${cashout.failure.percentage:50}")
     private int cashoutFailurePercentage;
     @Value("${cashout.latency.min.ms:100}")
     private int cashoutLatencyMinMs;
@@ -39,23 +39,23 @@ public class ApiController {
 
 
     // Configuration for /credit-analysis endpoint
-    @Value("${credit.analysis.latency.min.ms:1500}")
+    @Value("${credit.analysis.latency.min.ms:3500}")
     private int creditAnalysisLatencyMinMs;
-    @Value("${credit.analysis.latency.max.ms:3000}")
+    @Value("${credit.analysis.latency.max.ms:5000}")
     private int creditAnalysisLatencyMaxMs;
 
     // Configuration for /loan-request endpoint
-    @Value("${loan.request.failure.percentage:100}")
+    @Value("${loan.request.failure.percentage:20}")
     private int loanRequestFailurePercentage;
     @Value("${loan.request.latency.min.ms:50}")
     private int loanRequestLatencyMinMs;
     @Value("${loan.request.latency.max.ms:150}")
     private int loanRequestLatencyMaxMs;
-    @Value("${loan.request.error.5xx.code:500}")
+    @Value("${loan.request.error.5xx.code:503}")
     private int loanRequest5xxErrorCode;
     @Value("${loan.request.error.4xx.code:400}")
     private int loanRequest4xxErrorCode;
-    @Value("${loan.request.percentage.of.failures.as.5xx:100}")
+    @Value("${loan.request.percentage.of.failures.as.5xx:80}")
     private int loanRequestPercentageOfFailuresAs5xx;
 
 
